@@ -1,4 +1,4 @@
-package com.example.practicespring.global;
+package com.example.practicespring.global.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
