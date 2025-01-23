@@ -12,12 +12,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +31,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @Operation(summary = "회원가입", description = "이메일과 비밀번호로 사용자를 등록합니다.")
+    @Operation(summary = "회원가입", description = "이메일과 비밀번호, 사용자 이름, 나이로 사용자를 등록합니다.")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "생성 성공"),
         @ApiResponse(responseCode = "400", description = "이메일 중복", content = @Content(schema = @Schema(implementation = com.example.practicespring.global.exception.ErrorResponse.class))),
@@ -54,26 +54,19 @@ public class AuthController {
         throws NotFoundException {
         TokenResponse tokenResponse = authService.login(loginRequest);
 
-        Cookie refreshTokenCookie = new Cookie("refreshToken", tokenResponse.refreshToken());
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60);
-
-        response.addCookie(refreshTokenCookie);
-
-        return ResponseEntity.ok(new TokenResponse(tokenResponse.accessToken(), null));
+        return ResponseEntity.ok(
+            new TokenResponse(tokenResponse.accessToken(), tokenResponse.refreshToken()));
     }
 
-    @Operation(summary = "토큰 리프레시")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "갱신 성공"),
-        @ApiResponse(responseCode = "401", description = "리프레시 토큰 만료", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refresh(
-        @CookieValue(name = "refreshToken") String refreshToken)
-        throws NotFoundException {
-        return ResponseEntity.ok(authService.refresh(new RefreshRequest(refreshToken)));
-    }
+//    @Operation(summary = "토큰 리프레시")
+//    @ApiResponses({
+//        @ApiResponse(responseCode = "201", description = "갱신 성공"),
+//        @ApiResponse(responseCode = "401", description = "리프레시 토큰 만료", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+//    })
+//    @GetMapping("/refresh")
+//    public ResponseEntity<TokenResponse> refresh(
+//        @CookieValue(name = "refreshToken") String refreshToken)
+//        throws NotFoundException {
+//        return ResponseEntity.ok(authService.refresh(new RefreshRequest(refreshToken)));
+//    }
 }

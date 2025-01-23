@@ -25,13 +25,22 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private Long age;
+
     @Column
     private String refreshToken;
 
+
     @Builder
-    public Member(String email, String password) {
+    public Member(String email, String password, String name, Long age) {
         this.email = email;
         this.password = password;
+        this.name = name;
+        this.age = age;
     }
 
     protected Member() {

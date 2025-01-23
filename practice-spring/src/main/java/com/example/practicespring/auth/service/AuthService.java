@@ -26,7 +26,13 @@ public class AuthService {
         if (memberRepository.findByEmail(registerRequest.email()).isPresent()) {
             throw new DuplicateKeyException("중복되는 이메일입니다.");
         }
-        memberRepository.save(new Member(registerRequest.email(), registerRequest.password()));
+        Member newMember = Member.builder()
+            .email(registerRequest.email())
+            .password(registerRequest.password())
+            .name(registerRequest.name())
+            .age(registerRequest.age())
+            .build();
+        memberRepository.save(newMember);
     }
 
     @Transactional
