@@ -62,7 +62,7 @@ public class AuthService {
         member.validateRefreshToken(refreshToken);
 
         String newAccessToken = jwtUtil.generateAccessToken(email);
-        return new TokenResponse(newAccessToken, refreshToken);
+        return new TokenResponse(newAccessToken, null);
     }
 
 }
